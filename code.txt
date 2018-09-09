@@ -1,0 +1,455 @@
+PROC CONTENTS DATA=banco01; RUN;
+* Hay NaS????;
+PROC MI Data=banco01 simple; run;
+* Histogramas y graficos de cajas de las variables continuas;
+proc sgpanel data=banco01;
+ title "Histograma age - y";
+ panelby y / layout=rowlattice;
+ histogram age;
+ density age;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot age - y";
+ panelby y / layout=rowlattice;
+ hbox age;
+run;
+proc sgpanel data=banco01;
+ title "Histograma duration - y";
+ panelby y / layout=rowlattice;
+ histogram duration;
+ density duration;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of duration by y";
+ panelby y / layout=rowlattice;
+hbox duration;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of campaign by y";
+ panelby y / layout=rowlattice;
+ histogram campaign;
+ density campaign;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of campaign by y";
+ panelby y / layout=rowlattice;
+ hbox campaign;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of pdays by y";
+ panelby y / layout=rowlattice;
+ histogram pdays;
+ density pdays;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of pdays by y";
+ panelby y / layout=rowlattice;
+ hbox pdays;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of previous by y";
+ panelby y / layout=rowlattice;
+ histogram previous;
+ density previous;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of previous by y";
+ panelby y / layout=rowlattice;
+ hbox previous;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of emp_var_rate by y";
+ panelby y / layout=rowlattice;
+ histogram 'emp.var.rate'n;
+ density 'emp.var.rate'n;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of emp_var_rate by y";
+ panelby y / layout=rowlattice;
+ hbox 'emp.var.rate'n;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of cons_price_idx by y";
+ panelby y / layout=rowlattice;
+ histogram 'cons.price.idx'n;
+ density 'cons.price.idx'n;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of cons_price_idx by y";
+ panelby y / layout=rowlattice;
+ hbox 'cons.price.idx'n;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of cons_conf_idx by y";
+ panelby y / layout=rowlattice;
+ histogram 'cons.conf.idx'n ;
+ density 'cons.conf.idx'n ;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of cons_conf_idx by y";
+ panelby y / layout=rowlattice;
+ hbox 'cons.conf.idx'n ;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of euribor3m by y";
+ panelby y / layout=rowlattice;
+ histogram euribor3m;
+ density euribor3m;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of euribor3m by y";
+ panelby y / layout=rowlattice;
+ hbox euribor3m;
+run;
+proc sgpanel data=banco01;
+ title "Histogram of nr_employed by y";
+ panelby y / layout=rowlattice;
+ histogram 'nr.employed'n;
+ density 'nr.employed'n;
+run;
+proc sgpanel data=banco01;
+ title "Boxplot of nr_employed by y";
+ panelby y / layout=rowlattice;
+ hbox 'nr.employed'n;
+run;
+
+options validvarname=any;
+
+proc format; 
+value campaign 1 = '1' 2 = '2' 3='3' 4='>3';
+value previous 0 = 'never contacted' 1='contacted before';
+value emp_var_rate 1 = '<= -1.8' 2='[-1.8,-0.1)' 3='>-0.1';
+value cons_price_idx 1 = '<93.06' 2='[93.06,93.91]' 3='>93.91';
+value cons_conf_idx 1='<-46.2' 2='[-46.2,-42)' 3='[-42,-40)' 4='[-40,-36.4)' 5='>=-36.4';
+value euribor3m 1='<1.3' 2='[1.3,4.19)' 3='[4.19,4.86)' 4='[4.86,4.96)' 5='>=4.96';
+value nr_employed 1 = '<5099.1' 2='[5099.1,5191.02)' 3='>5191.02';
+
+* Frequency Table of campaign for recoding;
+proc sort data=banco01 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted order=freq;
+tables campaign / plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+* Frequency Table of pdays;
+proc sort data=banco01 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted order=freq;
+tables pdays / missing plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+* Frequency Table of previous;
+proc sort data=banco01 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted order=freq;
+tables previous / missing plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*--Set output size--*/
+ods graphics / reset imagemap;
+/*--SGPLOT proc statement--*/
+proc sgplot data=banco01;
+/*--TITLE and FOOTNOTE--*/
+title 'Grouped Bar Chart of emp_var_rate by y';
+/*--Bar chart settings--*/
+vbar 'emp.var.rate'n / group=y groupdisplay=Cluster name='Bar';
+/*--Response Axis--*/
+yaxis grid;
+run;
+ods graphics / reset;
+title;
+* Frequency Table of cons_price_idx;
+proc sort data=banco01 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted order=freq;
+tables 'cons.price.idx'n / missing plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*--Set output size--*/
+ods graphics / reset imagemap;
+/*--SGPLOT proc statement--*/
+proc sgplot data=banco01;
+/*--TITLE and FOOTNOTE--*/
+title 'Grouped Bar Chart of cons_price_idx by y';
+/*--Bar chart settings--*/
+vbar 'cons.price.idx'n / group=y groupdisplay=Cluster name='Bar';
+/*--Response Axis--*/
+yaxis grid;
+run;
+ods graphics / reset;
+title;
+ods noproctitle;
+*Bucket binning for cons_price_idx;
+proc hpbin data=banco01 numbin=3 bucket computestats computequantile;
+input 'cons.price.idx'n;
+run;
+* Frequency Table of cons_conf_idx;
+proc sort data=banco01 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted order=freq;
+tables 'cons.conf.idx'n / missing plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+*Set output size ods graphics / reset imagemap;
+*SGPLOT proc statement;
+proc sgplot data=banco01;
+*TITLE and FOOTNOTE;
+title 'Grouped Bar Chart of cons_conf_idx by y';
+*Bar chart settings;
+vbar 'cons.conf.idx'n / group=y groupdisplay=Cluster name='Bar';
+*Response Axis;
+yaxis grid;
+run;
+ods graphics / reset;
+title;
+*Quantile binning for cons_conf_idx;
+ods noproctitle;
+proc hpbin data=banco01 numbin=5 pseudo_quantile computestats
+computequantile;
+input 'cons.conf.idx'n;
+run;
+ods noproctitle;
+*Quantile binning for euribor3m;
+proc hpbin data=banco01 numbin=5 pseudo_quantile computestats
+computequantile;
+input euribor3m;
+run;
+*Quantile binning for nr_employed;
+ods noproctitle;
+proc hpbin data=banco01 numbin=4 pseudo_quantile;
+input 'nr.employed'n;
+run;
+
+
+
+
+
+*Creating categorical variables for continuous variables that require them;
+data banco02;
+ set banco01;
+ 
+pdays_cat = 'never contacted';
+if pdays ^= 999 then pdays_cat = 'contacted before';
+
+	campaign_cat = 999;
+	if campaign = 1 then campaign_cat = 1;
+	if campaign = 2 then campaign_cat = 2;
+	if campaign = 3 then campaign_cat = 3;
+	if campaign > 3 then campaign_cat = 4;
+
+	previous_cat = 1;
+	if previous = 0 then previous_cat = 0;
+
+	emp_var_rate_cat = 999;
+	if 'emp.var.rate'n LE -1.8 then emp_var_rate_cat = 1;
+	if ('emp.var.rate'n > -1.8) and ('emp.var.rate'n LE -0.1) then emp_var_rate_cat = 2;
+	if 'emp.var.rate'n > -0.1 then emp_var_rate_cat = 3;
+
+	cons_price_idx_cat = 999;
+	if 'cons.price.idx'n < 93.056333333 then cons_price_idx_cat = 1;
+	if ('cons.price.idx'n GE 93.056333333) and ('cons.price.idx'n LE 93.911666667) then 
+cons_price_idx_cat = 2;
+	if 'cons.price.idx'n > 93.911666667 then cons_price_idx_cat = 3;
+
+	cons_conf_idx_cat = 999;
+	if 'cons.conf.idx'n < -46.19925 then cons_conf_idx_cat = 1;
+	if ('cons.conf.idx'n GE -46.19925) and ('cons.conf.idx'n LE -41.99763) then
+cons_conf_idx_cat = 2;
+	if ('cons.conf.idx'n GE -41.99763) and ('cons.conf.idx'n LE -39.99959) then
+cons_conf_idx_cat = 3;
+	if ('cons.conf.idx'n GE -39.99959) and ('cons.conf.idx'n LE -36.39786) then
+cons_conf_idx_cat = 4;
+	if 'cons.conf.idx'n > -36.39786 then cons_conf_idx_cat = 5;
+
+	euribor3m_cat = 999;
+	if euribor3m < 1.2991788 then euribor3m_cat = 1;
+	if (euribor3m GE 1.2991788) and (euribor3m LE 4.1910304) then euribor3m_cat = 2;
+	if (euribor3m GE 4.1910304) and (euribor3m LE 4.864149) then euribor3m_cat = 3;
+	if (euribor3m GE 4.864149) and (euribor3m LE 4.9620732) then euribor3m_cat = 4;
+	if euribor3m > 4.9620732 then euribor3m_cat = 5;
+	
+	nr_employed_cat = 999;
+	if 'nr.employed'n < 5099.10335 then nr_employed_cat = 1;
+	if ('nr.employed'n GE 5099.10335) and ('nr.employed'n LE 5191.0171) then
+nr_employed_cat = 2;
+	if 'nr.employed'n > 5191.0171 then nr_employed_cat = 3;
+run;
+
+/*Frequency table for emp_var_rate_cat*/;
+proc sort data=banco02 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted;
+format emp_var_rate_cat emp_var_rate.;
+tables emp_var_rate_cat / plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*Frequency table for cons_price_idx_cat*/;
+proc sort data=banco02 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted;
+format cons_price_idx_cat cons_price_idx.;
+tables cons_price_idx_cat / plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*Frequency table for cons_conf_idx_cat*/;
+proc sort data=banco02 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted;
+format cons_conf_idx_cat cons_conf_idx.;
+tables cons_conf_idx_cat / plots=none; by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*Frequency table for euribor3m_cat */;
+proc sort data=banco02 out=Work.SortTempTableSorted; by y;
+run;
+proc freq data=Work.SortTempTableSorted;
+format euribor3m_cat euribor3m.;
+tables euribor3m_cat / plots=none;
+by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+/*Frequency table for nr_employed_cat*/;
+proc sort data=banco02 out=Work.SortTempTableSorted;
+by y;
+run;
+proc freq data=Work.SortTempTableSorted;
+format nr_employed_cat nr_employed.;
+tables nr_employed_cat / plots=none;
+by y;
+run;
+proc delete data=Work.SortTempTableSorted;
+run;
+
+*******************************************************;
+*******************Categorical Variables***************;
+ods noproctitle;
+proc freq data=banco02;
+tables (job) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (marital) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (education) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (default) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (housing) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (loan) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (contact) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (month) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (day_of_week) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format campaign_cat campaign.;
+tables (campaign_cat) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format previous_cat previous.;
+tables (previous_cat) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (poutcome) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format emp_var_rate_cat emp_var_rate.;
+tables (emp_var_rate_cat) *(y) / missing nopercent nocum
+plots(only)=(freqplot mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format cons_price_idx_cat cons_price_idx.;
+tables (cons_price_idx_cat) *(y) / missing nopercent nocum
+plots(only)=(freqplot mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format cons_conf_idx_cat cons_conf_idx.;
+tables (cons_conf_idx_cat) *(y) / missing nopercent nocum
+plots(only)=(freqplot mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format euribor3m_cat euribor3m.;
+tables (euribor3m_cat) *(y) / missing nopercent nocum plots(only)=(freqplot
+mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+format nr_employed_cat nr_employed.;
+tables (nr_employed_cat) *(y) / missing nopercent nocum
+plots(only)=(freqplot mosaicplot);
+run;
+ods noproctitle;
+proc freq data=banco02;
+tables (y) / missing nocum plots(only)=(freqplot mosaicplot);
+run;
+
+/*Collapsing categorical variables unknown level and levels that can be
+collapsed; Recode y into 1=yes, 0=no*/;
+data banco03;
+set banco02;
+if job = 'unknown' then job = 'admin.';
+if marital = 'unknown' then marital = 'married';
+if education = 'unknown' then education = 'university.degree';
+if education = 'illiterate' then DELETE;
+if default = 'yes' then DELETE;
+if housing = 'unknown' then housing = 'yes';
+if loan = 'unknown' then loan = 'no';
+if y = 'yes' then y2 =1;
+if y = 'no' then y2=0;
+drop y;
+rename y2=y;
+run;
+
+ods graphics on;
+
+proc hpsplit data=banco_modeling maxdepth=9;
+ class y 'cons.price.idx'n default job loan;
+ model y(event="1") = 'cons.price.idx'n default job loan;
+ prune costcomplexity; *(leaves=15) ;
+ partition fraction(validate = 0.5 seed=9889) ;
+run;
